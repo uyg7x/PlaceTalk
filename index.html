@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PlaceTalk — Ultra Minimal Nearby Search</title>
+<meta name="description" content="Ultra minimal nearby discovery for restaurants, metro, fuel, parks and everyday places around you."/>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><circle cx='24' cy='24' r='8' fill='%23111'/></svg>"/>
+<link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     NAVBAR
+══════════════════════════════════════ -->
+<nav class="navbar">
+  <div class="nav-logo" onclick="showView('landing')">
+    <div class="nav-logo-icon" aria-hidden="true"></div>
+    <div>
+      <div class="nav-logo-name">Place<span>Talk</span></div>
+      <div class="nav-logo-sub">Nearby Search</div>
+    </div>
+  </div>
+
+  <div class="nav-right">
+    <button class="btn-loc" onclick="getLocation()">
+      <span class="pulse"></span>Current Location
+    </button>
+    <div id="navUserArea">
+      <button class="btn btn-ghost btn-sm" onclick="openModal('authModal')">Log in</button>
+      <button class="btn btn-primary btn-sm" onclick="openModal('authModal');switchAuthTab('signup')">Sign up</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════
+     VIEW: LANDING (Home Screen)
+══════════════════════════════════════ -->
+<div class="view active" id="view-landing">
+  <section class="landing-hero premium-hero">
+    <div class="lh-bg premium-hero-bg">
+      <img class="lh-bg-img" id="heroBgImg"
+           src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1800&q=85"
+           alt="City"/>
+      <div class="lh-overlay premium-hero-overlay"></div>
+    </div>
+
+    <div class="premium-hero-inner">
+      <div class="premium-copy">
+        <div class="premium-kicker">Search what matters around you</div>
+        <h1 class="premium-heading">Search nearby. Find the right place faster.</h1>
+        <p class="premium-desc">Discover restaurants, cafes, metro stations, fuel stops and nature spots near your current location with quick results, map links and practical filters.</p>
+        <div class="premium-actions">
+          <button class="lh-btn-main" onclick="getLocation()">Use Current Location</button>
+          <button class="lh-btn-outline" onclick="showView('home');renderAll()">Browse Nearby Feed</button>
+        </div>
+        <div class="premium-metrics">
+          <div class="premium-metric"><strong>Restaurants</strong><span>Food, cafes and dining options nearby</span></div>
+          <div class="premium-metric"><strong>Transit</strong><span>Metro, bus stops and route-friendly places</span></div>
+          <div class="premium-metric"><strong>Everyday use</strong><span>Fuel, nature and essential stops around you</span></div>
+        </div>
+      </div>
+
+      <div class="premium-quick-card">
+        <div class="premium-card-kicker">Start with a category</div>
+        <div class="premium-card-title">Open a focused nearby feed</div>
+        <div class="premium-quick-grid">
+          <button class="premium-quick-btn" onclick="getLocationAndCat('restaurant')"><span>🍽️</span><small>Restaurants</small></button>
+          <button class="premium-quick-btn" onclick="getLocationAndCat('cafe')"><span>☕</span><small>Cafes</small></button>
+          <button class="premium-quick-btn" onclick="getLocationAndCat('fuel')"><span>⛽</span><small>Fuel</small></button>
+          <button class="premium-quick-btn" onclick="getLocationAndCat('metro')"><span>🚇</span><small>Metro</small></button>
+          <button class="premium-quick-btn" onclick="getLocationAndCat('hotel')"><span>🏨</span><small>Hotels</small></button>
+          <button class="premium-quick-btn" onclick="getLocationAndCat('nature')"><span>🌿</span><small>Nature</small></button>
+          <button class="premium-quick-btn" onclick="getLocationAndCat('atm')"><span>🏧</span><small>ATMs</small></button>
+          <button class="premium-quick-btn" onclick="getLocationAndCat('restroom')"><span>🚻</span><small>Restrooms</small></button>
+        </div>
+        <div class="premium-mini-note">Tap a category, open the nearby feed, then jump to maps, websites or food platforms in one step.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="visual-search-section">
+    <div class="visual-search-head">
+      <div>
+        <div class="premium-section-kicker">Popular searches</div>
+        <h2 class="premium-section-title">Explore with visual search cards</h2>
+      </div>
+      <p class="visual-search-copy">Swipe through food, travel and everyday nearby ideas, then open a matching feed instantly.</p>
+    </div>
+
+    <div class="visual-search-slider" aria-label="Visual search inspiration">
+      <div class="visual-search-track">
+        <button class="visual-slide" onclick="getLocationAndCat('restaurant')">
+          <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&q=85" alt="Restaurant dining"/>
+          <div class="visual-slide-overlay"><span>Restaurants</span><small>Dining, fast food and late-night spots</small></div>
+        </button>
+        <button class="visual-slide" onclick="getLocationAndCat('cafe')">
+          <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1200&q=85" alt="Cafe coffee"/>
+          <div class="visual-slide-overlay"><span>Cafes</span><small>Coffee, work tables and hangout corners</small></div>
+        </button>
+        <button class="visual-slide" onclick="getLocationAndCat('metro')">
+          <img src="https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=1200&q=85" alt="Metro station"/>
+          <div class="visual-slide-overlay"><span>Metro</span><small>Stations, transit links and quick routes</small></div>
+        </button>
+        <button class="visual-slide" onclick="getLocationAndCat('nature')">
+          <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1200&q=85" alt="Nature park"/>
+          <div class="visual-slide-overlay"><span>Nature</span><small>Parks, lakes and open spaces nearby</small></div>
+        </button>
+        <button class="visual-slide" onclick="getLocationAndCat('hotel')">
+          <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&q=85" alt="Hotel stay"/>
+          <div class="visual-slide-overlay"><span>Hotels</span><small>Stay options for short and long visits</small></div>
+        </button>
+        <button class="visual-slide" onclick="getLocationAndCat('fuel')">
+          <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=1200&q=85" alt="Fuel station"/>
+          <div class="visual-slide-overlay"><span>Fuel</span><small>Petrol pumps and useful stopovers</small></div>
+        </button>
+
+        <button class="visual-slide" onclick="getLocationAndCat('restaurant')" aria-hidden="true" tabindex="-1">
+          <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&q=85" alt=""/>
+          <div class="visual-slide-overlay"><span>Restaurants</span><small>Dining, fast food and late-night spots</small></div>
+        </button>
+        <button class="visual-slide" onclick="getLocationAndCat('cafe')" aria-hidden="true" tabindex="-1">
+          <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1200&q=85" alt=""/>
+          <div class="visual-slide-overlay"><span>Cafes</span><small>Coffee, work tables and hangout corners</small></div>
+        </button>
+        <button class="visual-slide" onclick="getLocationAndCat('metro')" aria-hidden="true" tabindex="-1">
+          <img src="https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=1200&q=85" alt=""/>
+          <div class="visual-slide-overlay"><span>Metro</span><small>Stations, transit links and quick routes</small></div>
+        </button>
+        <button class="visual-slide" onclick="getLocationAndCat('nature')" aria-hidden="true" tabindex="-1">
+          <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1200&q=85" alt=""/>
+          <div class="visual-slide-overlay"><span>Nature</span><small>Parks, lakes and open spaces nearby</small></div>
+        </button>
+        <button class="visual-slide" onclick="getLocationAndCat('hotel')" aria-hidden="true" tabindex="-1">
+          <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&q=85" alt=""/>
+          <div class="visual-slide-overlay"><span>Hotels</span><small>Stay options for short and long visits</small></div>
+        </button>
+        <button class="visual-slide" onclick="getLocationAndCat('fuel')" aria-hidden="true" tabindex="-1">
+          <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=1200&q=85" alt=""/>
+          <div class="visual-slide-overlay"><span>Fuel</span><small>Petrol pumps and useful stopovers</small></div>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <section class="premium-section premium-section-categories">
+    <div class="premium-section-head compact">
+      <div>
+        <div class="premium-section-kicker">Top categories</div>
+        <h2 class="premium-section-title">Start with a nearby category</h2>
+      </div>
+      <p class="visual-search-copy">Choose a category to open fast results around your current location.</p>
+    </div>
+
+    <div class="premium-section-grid">
+      <button class="premium-cat-tile" onclick="getLocationAndCat('restaurant')">
+        <div class="premium-cat-visual">🍽️</div>
+        <div class="premium-cat-meta"><strong>Restaurants</strong><span>Food, fast food and dining spots</span></div>
+      </button>
+      <button class="premium-cat-tile" onclick="getLocationAndCat('cafe')">
+        <div class="premium-cat-visual">☕</div>
+        <div class="premium-cat-meta"><strong>Cafes</strong><span>Quick coffee and hangout places</span></div>
+      </button>
+      <button class="premium-cat-tile" onclick="getLocationAndCat('metro')">
+        <div class="premium-cat-visual">🚇</div>
+        <div class="premium-cat-meta"><strong>Metro</strong><span>Stations and transit access</span></div>
+      </button>
+      <button class="premium-cat-tile" onclick="getLocationAndCat('fuel')">
+        <div class="premium-cat-visual">⛽</div>
+        <div class="premium-cat-meta"><strong>Fuel</strong><span>Petrol pumps and charging</span></div>
+      </button>
+      <button class="premium-cat-tile" onclick="getLocationAndCat('hotel')">
+        <div class="premium-cat-visual">🏨</div>
+        <div class="premium-cat-meta"><strong>Hotels</strong><span>Stay options nearby</span></div>
+      </button>
+      <button class="premium-cat-tile" onclick="getLocationAndCat('nature')">
+        <div class="premium-cat-visual">🌿</div>
+        <div class="premium-cat-meta"><strong>Nature</strong><span>Parks, viewpoints and open spaces</span></div>
+      </button>
+    </div>
+  </section>
+
+  <footer class="premium-footer premium-footer-clean">
+    <div class="premium-footer-top">
+      <div class="premium-footer-brand">
+        <div class="premium-footer-logo-row">
+          <div class="nav-logo-name">Place<span>Talk</span></div>
+          <span class="premium-footer-badge">Live nearby search</span>
+        </div>
+        <p>Clean nearby discovery for food, transit and everyday essentials, with simple community additions and fast map actions.</p>
+      </div>
+
+      <div class="premium-footer-grid">
+        <div class="premium-footer-col">
+          <div class="premium-footer-title">Product</div>
+          <ul class="premium-footer-list">
+            <li>Nearby search</li>
+            <li>Saved places</li>
+            <li>Community submissions</li>
+          </ul>
+        </div>
+
+        <div class="premium-footer-col">
+          <div class="premium-footer-title">Built for</div>
+          <ul class="premium-footer-list">
+            <li>Restaurants and cafes</li>
+            <li>Metro and local transit</li>
+            <li>Fuel, nature and essentials</li>
+          </ul>
+        </div>
+
+        <div class="premium-footer-col">
+          <div class="premium-footer-title">Trust</div>
+          <ul class="premium-footer-list">
+            <li>OpenStreetMap nearby data</li>
+            <li>Browser-based location access</li>
+            <li>Light, privacy-first experience</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="premium-footer-divider"></div>
+
+    <div class="premium-footer-meta premium-footer-meta-clean">
+      <span>© 2016 PlaceTalk</span>
+      <span>Nearby search, maps and everyday discovery</span>
+      <span>OpenStreetMap data + community places</span>
+    </div>
+  </footer>
+</div><!-- /view-landing -->
+
+<!-- ══════════════════════════════════════
+     VIEW: LOADING
+══════════════════════════════════════ -->
+<div class="view" id="view-loading">
+  <div class="loading-screen">
+    <div class="loading-radar">
+      <div class="radar-sweep"></div>
+      <div class="radar-dot center"></div>
+      <div class="radar-dot d1"></div>
+      <div class="radar-dot d2"></div>
+      <div class="radar-dot d3"></div>
+    </div>
+    <div class="loading-title">Finding nearby places…</div>
+    <div class="loading-sub" id="loadingSub">Getting your location</div>
+    <div class="loading-bar-wrap">
+      <div class="loading-bar" id="loadingBar"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     VIEW: HOME (Results)
+══════════════════════════════════════ -->
+<div class="view" id="view-home">
+  <div class="results-top">
+    <div class="loc-bar">
+      <div class="loc-bar-left">
+        <span class="loc-green-dot"></span>
+        <span id="locText">Finding your location…</span>
+      </div>
+      <div class="loc-bar-right">
+        <label>Radius</label>
+        <select class="radius-sel" id="radiusSelect" onchange="refetchAll()">
+          <option value="500">500m</option>
+          <option value="1000" selected>1 km</option>
+          <option value="2000">2 km</option>
+          <option value="5000">5 km</option>
+        </select>
+        <button class="btn btn-ghost btn-sm" onclick="getLocation()">Refresh</button>
+      </div>
+    </div>
+
+    <div class="cat-bar" id="catBar"></div>
+  </div>
+
+  <div class="results-wrap premium-results-wrap">
+    <div class="results-shell">
+      <div class="results-header">
+        <div>
+          <div class="results-eyebrow">Nearby results</div>
+          <div class="results-count" id="resultsCount"><span>0</span> places found near you</div>
+        </div>
+        <div class="sort-row">
+          <label>Sort</label>
+          <select class="sort-sel" id="sortSel" onchange="changeSort(this.value)">
+            <option value="distance">Nearest first</option>
+            <option value="rating">Top rated</option>
+            <option value="name">A–Z</option>
+          </select>
+          <button class="btn btn-primary btn-sm" onclick="requireAuth(openAddModal)">Add place</button>
+        </div>
+      </div>
+      <div class="places-grid" id="placesGrid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MODALS
+══════════════════════════════════════ -->
+
+<!-- Detail Modal -->
+<div class="modal-ov" id="detailModal" onclick="closeOnBd(event,'detailModal')">
+  <div class="modal-box modal-lg">
+    <button class="modal-x" onclick="closeModal('detailModal')">✕</button>
+    <div id="detailContent"></div>
+  </div>
+</div>
+
+<!-- Add Place Modal -->
+<div class="modal-ov" id="addModal" onclick="closeOnBd(event,'addModal')">
+  <div class="modal-box modal-md">
+    <button class="modal-x" onclick="closeModal('addModal')">✕</button>
+    <div class="modal-hd">
+      <div class="modal-title">Add a Place</div>
+      <div class="modal-sub">Share a nearby place with the community.</div>
+    </div>
+    <div class="modal-bd">
+
+      <div class="fg">
+        <label class="fl">Place Name <span class="req">*</span></label>
+        <input class="fi" id="apName" placeholder="e.g. Sharma Dhaba, City Mall, XYZ Clinic"/>
+      </div>
+
+      <div class="fg">
+        <label class="fl">Address / Location <span class="req">*</span></label>
+        <div class="loc-row">
+          <input class="fi" id="apAddress" placeholder="Street, area, landmark…"/>
+          <button class="loc-auto-btn" id="detectLocBtn" onclick="detectMyLoc()">Use current location</button>
+        </div>
+        <p class="fhint">Your GPS will be used to pin this place so others nearby can find it.</p>
+      </div>
+
+      <div class="fg">
+        <label class="fl">Category <span class="req">*</span></label>
+        <select class="fs" id="apCategory">
+          <option value="">Select category…</option>
+          <option value="restaurant">Restaurant / Food</option>
+          <option value="cafe">Cafe / Coffee Shop</option>
+          <option value="hotel">Hotel / Hostel</option>
+          <option value="shopping">Shop / Store / Market</option>
+          <option value="hospital">Hospital / Clinic / Pharmacy</option>
+          <option value="atm">ATM / Bank</option>
+          <option value="park">Park / Garden</option>
+          <option value="worship">Temple / Mosque / Church</option>
+          <option value="fuel">Petrol / CNG Station</option>
+          <option value="school">School / College</option>
+          <option value="restroom">Public Restroom</option>
+          <option value="bus">Bus Stop</option>
+          <option value="railway">Railway Station</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      <div class="fg">
+        <label class="fl">Budget / Price</label>
+        <div class="fi-prefix-wrap">
+          <span class="fi-prefix">₹</span>
+          <input class="fi with-prefix" id="apBudget" placeholder="e.g. 100–300 per person, Free, 500/night"/>
+        </div>
+        <p class="fhint">Write your own: "₹50–₹150", "Free", "₹500 per night"</p>
+      </div>
+
+      <div class="fg">
+        <label class="fl">Photos</label>
+        <div class="photo-zone" id="photoZone"
+             onclick="g('photoFileIn').click()"
+             ondragover="dragOver(event)" ondrop="dropPhoto(event)" ondragleave="dragLeave()">
+          <div class="pz-icon">📸</div>
+          <div class="pz-label">Click or drag photos here</div>
+          <div class="pz-hint">Or paste a URL below</div>
+        </div>
+        <input type="file" id="photoFileIn" accept="image/*" multiple style="display:none" onchange="handlePhotoFile(event)"/>
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          <input class="fi" id="apPhotoUrl" placeholder="Paste image URL…"
+                 onkeydown="if(event.key==='Enter'){addPhotoByUrl();event.preventDefault();}"/>
+          <button class="btn btn-ghost btn-sm" onclick="addPhotoByUrl()" style="white-space:nowrap;font-size:.76rem;">Add URL</button>
+        </div>
+        <div class="photos-prev" id="photosPreview"></div>
+      </div>
+
+      <div class="fg">
+        <label class="fl">Description</label>
+        <textarea class="fta" id="apDesc" placeholder="What makes this place special? Tips, what to order, parking info…" rows="3"></textarea>
+      </div>
+
+      <div class="fg-row">
+        <div class="fg">
+          <label class="fl">Opening Hours</label>
+          <input class="fi" id="apHours" placeholder="e.g. 9am–10pm, 24h"/>
+        </div>
+        <div class="fg">
+          <label class="fl">Phone</label>
+          <input class="fi" id="apPhone" placeholder="+91 98765 43210"/>
+        </div>
+      </div>
+
+      <div class="fg">
+        <label class="fl">Tags</label>
+        <div class="tag-wrap" id="tagWrap" onclick="g('tagInp')&&g('tagInp').focus()">
+          <input class="tag-inp" id="tagInp" placeholder="Add tags, press Enter…" onkeydown="handleTagKey(event)"/>
+        </div>
+        <p class="fhint">e.g. vegetarian, AC, rooftop, free-wifi, parking</p>
+      </div>
+
+      <div class="fg">
+        <label class="fl">Your Initial Rating</label>
+        <div class="sp-wrap" id="apStarPicker">
+          <button class="sp-btn" data-val="1" onclick="setApStars(1)">⭐</button>
+          <button class="sp-btn" data-val="2" onclick="setApStars(2)">⭐</button>
+          <button class="sp-btn" data-val="3" onclick="setApStars(3)">⭐</button>
+          <button class="sp-btn" data-val="4" onclick="setApStars(4)">⭐</button>
+          <button class="sp-btn" data-val="5" onclick="setApStars(5)">⭐</button>
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-lg btn-block" onclick="submitPlace()" style="margin-top:8px;">
+        Publish place
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Review Modal -->
+<div class="modal-ov" id="reviewModal" onclick="closeOnBd(event,'reviewModal')">
+  <div class="modal-box modal-md">
+    <button class="modal-x" onclick="closeModal('reviewModal')">✕</button>
+    <div class="modal-hd">
+      <div class="modal-title">Rate &amp; Review</div>
+      <div id="rvPlaceName" style="font-size:.8rem;color:var(--ink3);margin-top:3px;"></div>
+    </div>
+    <div class="modal-bd" style="padding-top:14px;">
+      <div class="fg">
+        <label class="fl">Your Rating <span class="req">*</span></label>
+        <div class="sp-wrap" id="rvStarPicker">
+          <button class="sp-btn" data-val="1" onclick="setRvStars(1)">⭐</button>
+          <button class="sp-btn" data-val="2" onclick="setRvStars(2)">⭐</button>
+          <button class="sp-btn" data-val="3" onclick="setRvStars(3)">⭐</button>
+          <button class="sp-btn" data-val="4" onclick="setRvStars(4)">⭐</button>
+          <button class="sp-btn" data-val="5" onclick="setRvStars(5)">⭐</button>
+        </div>
+      </div>
+      <div class="fg">
+        <label class="fl">Budget Spent</label>
+        <div class="fi-prefix-wrap">
+          <span class="fi-prefix">₹</span>
+          <input class="fi with-prefix" id="rvBudget" placeholder="e.g. 150 per person, Free"/>
+        </div>
+      </div>
+      <div class="fg">
+        <label class="fl">Your Review <span class="req">*</span></label>
+        <textarea class="fta" id="rvText" placeholder="Share your experience — what you loved, tips for others…" rows="4"></textarea>
+      </div>
+      <div class="fg">
+        <label class="fl">Photos (Optional)</label>
+        <div style="display:flex;gap:8px;">
+          <input class="fi" id="rvPhotoUrl" placeholder="Paste photo URL…"/>
+          <button class="btn btn-ghost btn-sm" onclick="addRvPhoto()" style="white-space:nowrap;font-size:.76rem;">+ Add</button>
+        </div>
+        <div class="photos-prev" id="rvPhotosPreview" style="margin-top:8px;"></div>
+      </div>
+      <button class="btn btn-primary btn-lg btn-block" onclick="submitReview()">Submit Review</button>
+    </div>
+  </div>
+</div>
+
+<!-- Auth Modal -->
+<div class="modal-ov" id="authModal" onclick="closeOnBd(event,'authModal')">
+  <div class="modal-box modal-sm">
+    <button class="modal-x" onclick="closeModal('authModal')">✕</button>
+    <div class="modal-hd">
+      <div class="modal-title">Welcome to PlaceTalk</div>
+      <div style="font-size:.78rem;color:var(--ink3);margin-top:3px;">Sign in to add places &amp; write reviews</div>
+    </div>
+    <div class="modal-bd" style="padding-top:8px;">
+      <div class="auth-tabs">
+        <div class="auth-tab active" id="atab-login" onclick="switchAuthTab('login')">Log In</div>
+        <div class="auth-tab" id="atab-signup" onclick="switchAuthTab('signup')">Sign Up</div>
+      </div>
+      <div class="auth-panel active" id="apanel-login">
+        <div class="fg">
+          <label class="fl">Email</label>
+          <input class="fi" id="loginEmail" type="email" placeholder="you@email.com"/>
+        </div>
+        <div class="fg">
+          <label class="fl">Password</label>
+          <input class="fi" id="loginPwd" type="password" placeholder="••••••••"
+                 onkeydown="if(event.key==='Enter')loginUser()"/>
+        </div>
+        <button class="btn btn-primary btn-lg btn-block" onclick="loginUser()" style="margin-top:8px;">Log In</button>
+        <p class="auth-link">No account? <a onclick="switchAuthTab('signup')">Sign up free</a></p>
+      </div>
+      <div class="auth-panel" id="apanel-signup">
+        <div class="fg-row">
+          <div class="fg">
+            <label class="fl">Name <span class="req">*</span></label>
+            <input class="fi" id="suName" placeholder="Your name"/>
+          </div>
+          <div class="fg">
+            <label class="fl">Email <span class="req">*</span></label>
+            <input class="fi" id="suEmail" type="email" placeholder="you@email.com"/>
+          </div>
+        </div>
+        <div class="fg-row">
+          <div class="fg">
+            <label class="fl">Password <span class="req">*</span></label>
+            <input class="fi" id="suPwd" type="password" placeholder="Min 6 chars"/>
+          </div>
+          <div class="fg">
+            <label class="fl">Confirm <span class="req">*</span></label>
+            <input class="fi" id="suConfirm" type="password" placeholder="Repeat"
+                   onkeydown="if(event.key==='Enter')signupUser()"/>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-lg btn-block" onclick="signupUser()">Create Account</button>
+        <p class="auth-link">Have an account? <a onclick="switchAuthTab('login')">Log in</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Profile Modal -->
+<div class="modal-ov" id="profileModal" onclick="closeOnBd(event,'profileModal')">
+  <div class="modal-box modal-lg">
+    <button class="modal-x" onclick="closeModal('profileModal')">✕</button>
+    <div class="prof-page">
+      <div class="prof-hd">
+        <div class="prof-av" id="profAv"></div>
+        <div>
+          <div class="prof-name" id="profName"></div>
+          <div class="prof-email" id="profEmail"></div>
+        </div>
+        <div class="prof-stats">
+          <div class="prof-stat"><div class="prof-stat-n" id="pStatP">0</div><div class="prof-stat-l">Places</div></div>
+          <div class="prof-stat"><div class="prof-stat-n" id="pStatR">0</div><div class="prof-stat-l">Reviews</div></div>
+          <div class="prof-stat"><div class="prof-stat-n" id="pStatS">0</div><div class="prof-stat-l">Saved</div></div>
+        </div>
+      </div>
+      <div class="prof-tabs">
+        <div class="prof-tab active" onclick="switchProfTab('my-places',this)">My Places</div>
+        <div class="prof-tab" onclick="switchProfTab('my-revs',this)">My Reviews</div>
+        <div class="prof-tab" onclick="switchProfTab('saved',this)">Saved</div>
+        <div class="prof-tab" onclick="switchProfTab('settings',this)">Settings</div>
+      </div>
+      <div class="prof-panel active" id="pp-my-places">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:14px;">
+          <button class="btn btn-primary btn-sm" onclick="closeModal('profileModal');requireAuth(openAddModal)">+ Add New Place</button>
+        </div>
+        <div class="places-grid" id="ppMyPlaces"></div>
+      </div>
+      <div class="prof-panel" id="pp-my-revs"><div id="ppMyRevs"></div></div>
+      <div class="prof-panel" id="pp-saved"><div class="places-grid" id="ppSaved"></div></div>
+      <div class="prof-panel" id="pp-settings">
+        <div style="background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px;">
+          <div style="font-weight:700;font-size:.92rem;margin-bottom:14px;">Account Settings</div>
+          <div class="fg"><label class="fl">Display Name</label><input class="fi" id="settName"/></div>
+          <div class="fg"><label class="fl">New Password</label><input class="fi" type="password" id="settPwd" placeholder="Leave blank to keep current"/></div>
+          <div style="display:flex;gap:10px;margin-top:6px;">
+            <button class="btn btn-primary" onclick="saveSettings()">Save Changes</button>
+            <button class="btn btn-danger" onclick="logoutUser()" style="margin-left:auto;">Log Out</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
+<div class="cursor-ring" id="cursorRing" aria-hidden="true"></div>
+<script src="js/app.js"></script>
+</body>
+</html>
