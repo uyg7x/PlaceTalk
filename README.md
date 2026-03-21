@@ -50,7 +50,3 @@ PlaceTalk uses the browser’s geolocation service. Sometimes desktop browsers o
 
 Still, exact accuracy may depend on:
 
-browser support
-device GPS availability
-Wi-Fi based positioning
-operating system location settings
